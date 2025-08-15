@@ -5,13 +5,14 @@ namespace Mkosturkov\Chess\Domain\ChessGame;
 final class Game
 {
     public function __construct(
-        private Board $board
+        private Board $board,
+        private Color $onTurn = Color::White
     ) {}
 
     public function isMoveAllowed(Position $from, Position $to): bool
     {
         $piece = $this->board->getPiece($from);
-        if ($piece === null || $piece->type !== PieceType::Pawn) {
+        if ($piece === null || $piece->color !== $this->onTurn) {
             return false;
         }
 

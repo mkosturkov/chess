@@ -92,7 +92,8 @@ class PawnsMovementTest extends TestCase
      */
     public function getAllowedMoves(Board $board, Position $from): PositionsCollection
     {
-        $game = new Game($board);
+        $piece = $board->getPiece($from);
+        $game = new Game($board, $piece->color);
         return new PositionsCollection()
             ->filter(fn($p) => $game->isMoveAllowed($from, $p));
     }
