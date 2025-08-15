@@ -8,6 +8,11 @@
             "Mkosturkov\\Chess\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Mkosturkov\\Chess\\Test\\": "test/Unit/"
+        }
+    },
     "authors": [
         {
             "name": "Milko Kosturkov"
