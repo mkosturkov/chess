@@ -2,25 +2,23 @@
 
 namespace Mkosturkov\Chess\Test\Domain\Game\PiecesMovement;
 
-use Mkosturkov\Chess\Domain\ChessGame\Board;
 use Mkosturkov\Chess\Domain\ChessGame\Color;
 use Mkosturkov\Chess\Domain\ChessGame\File;
-use Mkosturkov\Chess\Domain\ChessGame\Game;
 use Mkosturkov\Chess\Domain\ChessGame\Piece;
 use Mkosturkov\Chess\Domain\ChessGame\PieceType;
 use Mkosturkov\Chess\Domain\ChessGame\Position;
-use Mkosturkov\Chess\Domain\ChessGame\PositionsCollection;
 use Mkosturkov\Chess\Domain\ChessGame\Rank;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class PawnsMovementTest extends TestCase
 {
+    use MovementTestsHelpers;
 
     #[DataProvider('pawnForwardMovementProvider')]
     public function test_pawn_can_move_one_rank_forward(Color $color, Rank $targetRank)
     {
-        [$from, $board] = $this->setupBoard($color);
+        [$from, $board] = $this->setupBoard($color, PieceType::Pawn);
         $allowed = $this->getAllowedMoves($board, $from);
 
         $this->assertEquals(1, $allowed->count());
@@ -30,7 +28,7 @@ class PawnsMovementTest extends TestCase
     #[DataProvider('pawnForwardMovementProvider')]
     public function test_white_pawn_can_capture(Color $color, Rank $targetRank)
     {
-        [$from, $board] = $this->setupBoard($color);
+        [$from, $board] = $this->setupBoard($color, PieceType::Pawn);
         $board = $board
             ->withPiece(
                 new Position(File::C, $targetRank),
@@ -51,7 +49,7 @@ class PawnsMovementTest extends TestCase
     #[DataProvider('pawnForwardMovementProvider')]
     public function test_pawn_is_blocked_by_own(Color $color, Rank $targetRank)
     {
-        [$from, $board] = $this->setupBoard($color);
+        [$from, $board] = $this->setupBoard($color, PieceType::Pawn);;
         $board = $board
             ->withPiece(
                 new Position(File::D, $targetRank),
@@ -65,7 +63,7 @@ class PawnsMovementTest extends TestCase
     #[DataProvider('pawnForwardMovementProvider')]
     public function test_pawn_is_blocked_enemy(Color $color, Rank $targetRank)
     {
-        [$from, $board] = $this->setupBoard($color);
+        [$from, $board] = $this->setupBoard($color, PieceType::Pawn);
         $board = $board
             ->withPiece(
                 new Position(File::D, $targetRank),
@@ -83,29 +81,5 @@ class PawnsMovementTest extends TestCase
             'white pawn moves forward' => [Color::White, Rank::Five],
             'black pawn moves forward' => [Color::Black, Rank::Three]
         ];
-    }
-
-    /**
-     * @param Board $board
-     * @param Position $from
-     * @return PositionsCollection
-     */
-    public function getAllowedMoves(Board $board, Position $from): PositionsCollection
-    {
-        $piece = $board->getPiece($from);
-        $game = new Game($board, $piece->color);
-        return new PositionsCollection()
-            ->filter(fn($p) => $game->isMoveAllowed($from, $p));
-    }
-
-    public function setupBoard(Color $color): array
-    {
-        $from = new Position(File::D, Rank::Four);
-        $board = new Board()
-            ->withPiece(
-                $from,
-                new Piece($color, PieceType::Pawn)
-            );
-        return [$from, $board];
     }
 }
