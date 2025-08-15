@@ -16,8 +16,9 @@ final class Game
             && $from != $to
             && $piece->color === $this->onTurn
             && match ($piece->type) {
-                PieceType::Pawn => $this->isPawnMoveAllowed($from, $to, $piece),
                 PieceType::Rook => $this->isRookMoveAllowed($from, $to, $piece),
+                PieceType::Bishop => $this->isBishopMoveAllowed($from, $to, $piece),
+                PieceType::Pawn => $this->isPawnMoveAllowed($from, $to, $piece),
                 default => false,
             };
     }
@@ -25,6 +26,11 @@ final class Game
     private function isRookMoveAllowed(Position $from, Position $to, Piece $piece): bool
     {
         return $from->isOnStraight($to) && $this->pathIsFree($from, $to, $piece);
+    }
+
+    private function isBishopMoveAllowed(Position $from, Position $to, Piece $piece): bool
+    {
+        return $from->isOnDiagonal($to) && $this->pathIsFree($from, $to, $piece);
     }
 
     private function pathIsFree(Position $from, Position $to, Piece $piece): bool
@@ -50,7 +56,7 @@ final class Game
         return $isNotBlocked;
     }
 
-    private function isPawnMoveAllowed(Position $from, Position $to): bool
+    private function isPawnMoveAllowed(Position $from, Position $to, Piece $piece): bool
     {
         $direction = $this->onTurn === Color::White ? 1 : -1;
         $rankDiff = $to->rank->value - $from->rank->value;
@@ -66,7 +72,7 @@ final class Game
 
         if ($fileDiff === 1) {
             $targetPiece = $this->board->getPiece($to);
-            return $targetPiece !== null && $targetPiece->color !== $this->onTurn;
+            return $targetPiece !== null && $targetPiece->color !== $piece->color;
         }
         return false;
     }

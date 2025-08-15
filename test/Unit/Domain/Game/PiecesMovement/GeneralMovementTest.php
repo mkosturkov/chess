@@ -23,6 +23,16 @@ class GeneralMovementTest extends TestCase
         $this->assertFalse($game->isMoveAllowed($from, $to));
     }
 
+    public function test_can_not_move_to_source()
+    {
+        $this->markTestIncomplete();
+    }
+
+    public function test_can_not_move_in_an_unorthodox_way()
+    {
+        $this->markTestIncomplete();
+    }
+
     public function test_can_not_move_if_not_on_turn()
     {
         $board = new Board();
