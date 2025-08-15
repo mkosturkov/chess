@@ -12,11 +12,47 @@ final class Game
     public function isMoveAllowed(Position $from, Position $to): bool
     {
         $piece = $this->board->getPiece($from);
-        if ($piece === null || $piece->color !== $this->onTurn) {
-            return false;
-        }
+        return $piece !== null
+            && $from != $to
+            && $piece->color === $this->onTurn
+            && match ($piece->type) {
+                PieceType::Pawn => $this->isPawnMoveAllowed($from, $to, $piece),
+                PieceType::Rook => $this->isRookMoveAllowed($from, $to, $piece),
+                default => false,
+            };
+    }
 
-        $direction = $piece->color === Color::White ? 1 : -1;
+    private function isRookMoveAllowed(Position $from, Position $to, Piece $piece): bool
+    {
+        return $from->isOnStraight($to) && $this->pathIsFree($from, $to, $piece);
+    }
+
+    private function pathIsFree(Position $from, Position $to, Piece $piece): bool
+    {
+        $movementVector = [
+            $to->file->value <=> $from->file->value,
+            $to->rank->value <=> $from->rank->value,
+        ];
+
+        $next = $from;
+        do {
+            $next = new Position(
+                File::from($next->file->value + $movementVector[0]),
+                Rank::from($next->rank->value + $movementVector[1])
+            );
+            $blockingPiece = $this->board->getPiece($next);
+
+            $isNotBlocked =
+                $blockingPiece === null
+                || ($blockingPiece->color !== $piece->color && $next == $to);
+        } while ($isNotBlocked && $next != $to);
+
+        return $isNotBlocked;
+    }
+
+    private function isPawnMoveAllowed(Position $from, Position $to): bool
+    {
+        $direction = $this->onTurn === Color::White ? 1 : -1;
         $rankDiff = $to->rank->value - $from->rank->value;
         $fileDiff = abs($to->file->value - $from->file->value);
 
@@ -30,9 +66,8 @@ final class Game
 
         if ($fileDiff === 1) {
             $targetPiece = $this->board->getPiece($to);
-            return $targetPiece !== null && $targetPiece->color !== $piece->color;
+            return $targetPiece !== null && $targetPiece->color !== $this->onTurn;
         }
-
         return false;
     }
 

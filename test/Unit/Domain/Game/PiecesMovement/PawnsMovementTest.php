@@ -15,10 +15,16 @@ class PawnsMovementTest extends TestCase
 {
     use MovementTestsHelpers;
 
+    protected function getPieceType(): PieceType
+    {
+        return PieceType::Pawn;
+    }
+
+
     #[DataProvider('pawnForwardMovementProvider')]
     public function test_pawn_can_move_one_rank_forward(Color $color, Rank $targetRank)
     {
-        [$from, $board] = $this->setupBoard($color, PieceType::Pawn);
+        [$from, $board] = $this->setupBoard(PieceType::Pawn, $color);
         $allowed = $this->getAllowedMoves($board, $from);
 
         $this->assertEquals(1, $allowed->count());
@@ -28,7 +34,7 @@ class PawnsMovementTest extends TestCase
     #[DataProvider('pawnForwardMovementProvider')]
     public function test_white_pawn_can_capture(Color $color, Rank $targetRank)
     {
-        [$from, $board] = $this->setupBoard($color, PieceType::Pawn);
+        [$from, $board] = $this->setupBoard(PieceType::Pawn, $color);
         $board = $board
             ->withPiece(
                 new Position(File::C, $targetRank),
@@ -49,7 +55,7 @@ class PawnsMovementTest extends TestCase
     #[DataProvider('pawnForwardMovementProvider')]
     public function test_pawn_is_blocked_by_own(Color $color, Rank $targetRank)
     {
-        [$from, $board] = $this->setupBoard($color, PieceType::Pawn);;
+        [$from, $board] = $this->setupBoard(PieceType::Pawn, $color);
         $board = $board
             ->withPiece(
                 new Position(File::D, $targetRank),
@@ -63,7 +69,7 @@ class PawnsMovementTest extends TestCase
     #[DataProvider('pawnForwardMovementProvider')]
     public function test_pawn_is_blocked_enemy(Color $color, Rank $targetRank)
     {
-        [$from, $board] = $this->setupBoard($color, PieceType::Pawn);
+        [$from, $board] = $this->setupBoard(PieceType::Pawn, $color);
         $board = $board
             ->withPiece(
                 new Position(File::D, $targetRank),
