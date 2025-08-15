@@ -11,24 +11,28 @@ final class Game
     public function isMoveAllowed(Position $from, Position $to): bool
     {
         $piece = $this->board->getPiece($from);
-
-        // Can capture
-        if (
-            abs($from->file->value - $to->file->value) === 1
-            && $this->board->getPiece($to)?->color === $piece->color->opposite()
-        ) {
-            return true;
-        }
-
-        // Is blocked
-        if ($this->board->getPiece($to) !== null) {
+        if ($piece === null || $piece->type !== PieceType::Pawn) {
             return false;
         }
 
-        // Can move
-        $direction = $piece->color == Color::White ? 1 : -1;
-        return $from->file == $to->file
-            && $to->rank->value - $from->rank->value === $direction;
+        $direction = $piece->color === Color::White ? 1 : -1;
+        $rankDiff = $to->rank->value - $from->rank->value;
+        $fileDiff = abs($to->file->value - $from->file->value);
+
+        if ($rankDiff !== $direction) {
+            return false;
+        }
+
+        if ($fileDiff === 0) {
+            return $this->board->getPiece($to) === null;
+        }
+
+        if ($fileDiff === 1) {
+            $targetPiece = $this->board->getPiece($to);
+            return $targetPiece !== null && $targetPiece->color !== $piece->color;
+        }
+
+        return false;
     }
 
 }
