@@ -33,6 +33,16 @@ class GeneralMovementTest extends TestCase
         $this->markTestIncomplete();
     }
 
+    public function test_can_not_move_if_going_to_lead_to_mate()
+    {
+        $this->markTestIncomplete();
+    }
+
+    public function test_can_not_move_anything_but_to_escape_mate()
+    {
+        $this->markTestIncomplete();
+    }
+
     public function test_can_not_move_if_not_on_turn()
     {
         $board = new Board();
