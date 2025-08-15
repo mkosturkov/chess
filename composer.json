@@ -1,0 +1,19 @@
+{
+    "name": "mkosturkov/chess",
+    "description": "An experimental chess game",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mkosturkov\\Chess\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Milko Kosturkov"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^12.3.4"
+    }
+}
