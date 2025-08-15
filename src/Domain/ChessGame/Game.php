@@ -18,6 +18,7 @@ final class Game
             && match ($piece->type) {
                 PieceType::Rook => $this->isRookMoveAllowed($from, $to, $piece),
                 PieceType::Bishop => $this->isBishopMoveAllowed($from, $to, $piece),
+                PieceType::Queen => $this->isQueenMoveAllowed($from, $to, $piece),
                 PieceType::Pawn => $this->isPawnMoveAllowed($from, $to, $piece),
                 default => false,
             };
@@ -31,6 +32,12 @@ final class Game
     private function isBishopMoveAllowed(Position $from, Position $to, Piece $piece): bool
     {
         return $from->isOnDiagonal($to) && $this->pathIsFree($from, $to, $piece);
+    }
+
+    private function isQueenMoveAllowed(Position $from, Position $to, Piece $piece): bool
+    {
+        return $this->isRookMoveAllowed($from, $to, $piece)
+            || $this->isBishopMoveAllowed($from, $to, $piece);
     }
 
     private function pathIsFree(Position $from, Position $to, Piece $piece): bool
