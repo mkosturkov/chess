@@ -20,15 +20,8 @@ class PawnsMovementTest extends TestCase
     #[DataProvider('pawnForwardMovementProvider')]
     public function test_pawn_can_move_one_rank_forward(Color $color, Rank $targetRank)
     {
-        $from = new Position(File::D, Rank::Four);
-        $board = new Board()
-            ->withPiece(
-                $from,
-                new Piece($color, PieceType::Pawn)
-            );
-        $game = new Game($board);
-        $allowed = new PositionsCollection()
-            ->filter(fn($p) => $game->isMoveAllowed($from, $p));
+        [$from, $board] = $this->setupBoard($color);
+        $allowed = $this->getAllowedMoves($board, $from);
 
         $this->assertEquals(1, $allowed->count());
         $this->assertTrue($allowed->contains(new Position(File::D, $targetRank)));
@@ -37,12 +30,8 @@ class PawnsMovementTest extends TestCase
     #[DataProvider('pawnForwardMovementProvider')]
     public function test_white_pawn_can_capture(Color $color, Rank $targetRank)
     {
-        $from = new Position(File::D, RANK::Four);
-        $board = new Board()
-            ->withPiece(
-                $from,
-                new Piece($color, PieceType::Pawn)
-            )
+        [$from, $board] = $this->setupBoard($color);
+        $board = $board
             ->withPiece(
                 new Position(File::C, $targetRank),
                 new Piece($color->opposite(), PieceType::Pawn)
@@ -51,9 +40,7 @@ class PawnsMovementTest extends TestCase
                 new Position(File::E, $targetRank),
                 new Piece($color->opposite(), PieceType::Pawn)
             );
-        $game = new Game($board);
-        $allowed = new PositionsCollection()
-            ->filter(fn($p) => $game->isMoveAllowed($from, $p));
+        $allowed = $this->getAllowedMoves($board, $from);
 
         $this->assertEquals(3, $allowed->count());
         $this->assertTrue($allowed->contains(new Position(File::D, $targetRank)));
@@ -64,39 +51,28 @@ class PawnsMovementTest extends TestCase
     #[DataProvider('pawnForwardMovementProvider')]
     public function test_pawn_is_blocked_by_own(Color $color, Rank $targetRank)
     {
-        $from = new Position(File::D, Rank::Four);
-        $board = new Board()
-            ->withPiece(
-                $from,
-                new Piece($color, PieceType::Pawn)
-            )
+        [$from, $board] = $this->setupBoard($color);
+        $board = $board
             ->withPiece(
                 new Position(File::D, $targetRank),
                 new Piece($color, PieceType::Pawn)
             );
-        $game = new Game($board);
-        $allowed = new PositionsCollection()
-            ->filter(fn($p) => $game->isMoveAllowed($from, $p));
 
+        $allowed = $this->getAllowedMoves($board, $from);
         $this->assertEquals(0, $allowed->count());
     }
 
     #[DataProvider('pawnForwardMovementProvider')]
     public function test_pawn_is_blocked_enemy(Color $color, Rank $targetRank)
     {
-        $from = new Position(File::D, Rank::Four);
-        $board = new Board()
-            ->withPiece(
-                $from,
-                new Piece($color, PieceType::Pawn)
-            )
+        [$from, $board] = $this->setupBoard($color);
+        $board = $board
             ->withPiece(
                 new Position(File::D, $targetRank),
                 new Piece($color->opposite(), PieceType::Pawn)
             );
-        $game = new Game($board);
-        $allowed = new PositionsCollection()
-            ->filter(fn($p) => $game->isMoveAllowed($from, $p));
+
+        $allowed = $this->getAllowedMoves($board, $from);
 
         $this->assertEquals(0, $allowed->count());
     }
@@ -107,5 +83,28 @@ class PawnsMovementTest extends TestCase
             'white pawn moves forward' => [Color::White, Rank::Five],
             'black pawn moves forward' => [Color::Black, Rank::Three]
         ];
+    }
+
+    /**
+     * @param Board $board
+     * @param Position $from
+     * @return PositionsCollection
+     */
+    public function getAllowedMoves(Board $board, Position $from): PositionsCollection
+    {
+        $game = new Game($board);
+        return new PositionsCollection()
+            ->filter(fn($p) => $game->isMoveAllowed($from, $p));
+    }
+
+    public function setupBoard(Color $color): array
+    {
+        $from = new Position(File::D, Rank::Four);
+        $board = new Board()
+            ->withPiece(
+                $from,
+                new Piece($color, PieceType::Pawn)
+            );
+        return [$from, $board];
     }
 }
