@@ -14,6 +14,4 @@ class QueenMovementTest extends TestCase
     {
         return PieceType::Queen;
     }
-
-
 }

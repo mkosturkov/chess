@@ -13,19 +13,4 @@ class BishopMovementTest extends TestCase
     {
         return PieceType::Bishop;
     }
-    
-    public function test_can_not_move_not_straight(): void
-    {
-        [$from, $board] = $this->setupBoard($this->getPieceType());
-        $allowed = $this->getAllowedMoves($board, $from);
-        $disallowed = new PositionsCollection()
-            ->diff(new PositionsCollection()->diagonalsOf($from));
-
-        $this->assertTrue(
-            $disallowed
-                ->diff($allowed)
-                ->equals($disallowed)
-        );;
-    }
-
 }

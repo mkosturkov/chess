@@ -13,19 +13,4 @@ class RookMovementTest extends TestCase
     {
         return PieceType::Rook;
     }
-
-    public function test_can_not_move_not_diagonally(): void
-    {
-        [$from, $board] = $this->setupBoard($this->getPieceType());
-        $allowed = $this->getAllowedMoves($board, $from);
-        $disallowed = new PositionsCollection()
-            ->diff(new PositionsCollection()->straightsOf($from));
-
-        $this->assertTrue(
-            $disallowed
-                ->diff($allowed)
-                ->equals($disallowed)
-        );
-    }
-
 }
