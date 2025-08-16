@@ -15,9 +15,7 @@ trait CanMoveStraight
     {
         [$from, $board] = $this->setupBoard($this->getPieceType());
         $allowed = $this->getAllowedMoves($board, $from);
-        $expected = new PositionsCollection()
-            ->straightsOf($from)
-            ->filter(fn ($p) => $p != $from);
+        $expected = new PositionsCollection()->straightsOf($from);
         $this->assertTrue($expected->equals($allowed));
     }
 

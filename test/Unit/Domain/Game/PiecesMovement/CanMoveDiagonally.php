@@ -15,9 +15,7 @@ trait CanMoveDiagonally
     {
         [$from, $board] = $this->setupBoard($this->getPieceType());
         $allowed = $this->getAllowedMoves($board, $from);
-        $expected = new PositionsCollection()
-            ->diagonalsOf($from)
-            ->filter(fn ($p) => $p != $from);
+        $expected = new PositionsCollection()->diagonalsOf($from);
         $this->assertTrue($expected->equals($allowed));
     }
 

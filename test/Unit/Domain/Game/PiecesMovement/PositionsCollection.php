@@ -52,13 +52,6 @@ final class PositionsCollection
         return $this->filter(fn($i) => !$other->contains($i));
     }
 
-    public function merge(PositionsCollection $other): self
-    {
-        $c = clone $this;
-        $c->positions = array_merge($this->positions, $other->positions);
-        return $c;
-    }
-
     public function equals(PositionsCollection $other): bool
     {
         return $this->diff($other)->count() === 0;
