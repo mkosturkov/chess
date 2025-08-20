@@ -25,7 +25,8 @@ class GeneralMovementTest extends TestCase
 
     public function test_can_not_move_to_source()
     {
-        $this->markTestIncomplete();
+        [$from, $board] = $this->setupBoard(PieceType::Rook);
+        $this->assertFalse($this->isMoveAllowed($board, $from, $from));
     }
 
     public function test_can_not_move_in_an_unorthodox_way()
