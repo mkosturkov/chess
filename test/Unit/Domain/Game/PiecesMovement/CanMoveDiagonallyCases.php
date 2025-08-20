@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 trait CanMoveDiagonallyCases
 {
-    use CommonMovementCases;
+    use LinesMovementCases;
 
     public function test_can_move_diagonally(): void
     {

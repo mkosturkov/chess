@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 trait CanMoveStraightCases
 {
-    use CommonMovementCases;
+    use LinesMovementCases;
 
     public function test_can_move_straight(): void
     {

@@ -7,7 +7,7 @@ use Mkosturkov\Chess\Domain\ChessGame\Piece;
 use Mkosturkov\Chess\Domain\ChessGame\PieceType;
 use Mkosturkov\Chess\Domain\ChessGame\Position;
 
-trait CommonMovementCases
+trait LinesMovementCases
 {
     use MovementTestsHelpers;
 
