@@ -7,9 +7,9 @@ use Mkosturkov\Chess\Domain\ChessGame\Position;
 use Mkosturkov\Chess\Domain\ChessGame\Rank;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-trait CanMoveStraight
+trait CanMoveStraightCases
 {
-    use MovementTestsHelpers;
+    use CommonMovementCases;
 
     public function test_can_move_straight(): void
     {

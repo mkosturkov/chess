@@ -9,10 +9,10 @@ final class Game
         private Color $onTurn = Color::White
     ) {}
 
-    public function isMoveAllowed(Position $from, Position $to): bool
+    public function makeMove(Position $from, Position $to): void
     {
         $piece = $this->board->getPiece($from);
-        return $piece !== null
+        $isMoveAllowed = $piece !== null
             && $from != $to
             && $piece->color === $this->onTurn
             && match ($piece->type) {
@@ -22,6 +22,10 @@ final class Game
                 PieceType::Pawn => $this->isPawnMoveAllowed($from, $to, $piece),
                 default => false,
             };
+
+        if (!$isMoveAllowed) {
+            throw new MoveNotAllowed($from, $to);
+        }
     }
 
     private function isRookMoveAllowed(Position $from, Position $to, Piece $piece): bool

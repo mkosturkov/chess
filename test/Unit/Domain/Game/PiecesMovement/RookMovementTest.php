@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class RookMovementTest extends TestCase
 {
-    use CanMoveStraight;
+    use CanMoveStraightCases;
 
     protected function getPieceType(): PieceType
     {

@@ -7,8 +7,8 @@ use PHPUnit\Framework\TestCase;
 
 class QueenMovementTest extends TestCase
 {
-    use CanMoveStraight;
-    use CanMoveDiagonally;
+    use CanMoveStraightCases;
+    use CanMoveDiagonallyCases;
 
     protected function getPieceType(): PieceType
     {

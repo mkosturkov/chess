@@ -7,9 +7,9 @@ use Mkosturkov\Chess\Domain\ChessGame\Position;
 use Mkosturkov\Chess\Domain\ChessGame\Rank;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-trait CanMoveDiagonally
+trait CanMoveDiagonallyCases
 {
-    use MovementTestsHelpers;
+    use CommonMovementCases;
 
     public function test_can_move_diagonally(): void
     {

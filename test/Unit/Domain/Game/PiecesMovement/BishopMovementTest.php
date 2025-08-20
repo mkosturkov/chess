@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class BishopMovementTest extends TestCase
 {
-    use CanMoveDiagonally;
+    use CanMoveDiagonallyCases;
 
     protected function getPieceType(): PieceType
     {
