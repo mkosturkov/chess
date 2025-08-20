@@ -29,11 +29,6 @@ class GeneralMovementTest extends TestCase
         $this->assertFalse($this->isMoveAllowed($board, $from, $from));
     }
 
-    public function test_can_not_move_in_an_unorthodox_way()
-    {
-        $this->markTestIncomplete();
-    }
-
     public function test_can_not_move_if_going_to_lead_to_mate()
     {
         $this->markTestIncomplete();
