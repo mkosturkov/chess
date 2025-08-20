@@ -15,62 +15,72 @@ final class Game
         $isMoveAllowed = $piece !== null
             && $from != $to
             && $piece->color === $this->onTurn
-            && match ($piece->type) {
-                PieceType::Rook => $this->isRookMoveAllowed($from, $to, $piece),
-                PieceType::Bishop => $this->isBishopMoveAllowed($from, $to, $piece),
-                PieceType::Queen => $this->isQueenMoveAllowed($from, $to, $piece),
-                PieceType::Knight => $this->isKnightMoveAllowed($from, $to, $piece),
-                PieceType::King => $this->isKingMoveAllowed($from, $to, $piece),
-                PieceType::Pawn => $this->isPawnMoveAllowed($from, $to, $piece),
-                default => false,
-            };
+            && $this->isPieceMoveAllowed($this->board, $from, $to, $this->onTurn)
+            && !$this->willBeCheckMate($from, $to);
 
         if (!$isMoveAllowed) {
             throw new MoveNotAllowed($from, $to);
         }
     }
 
-    private function isRookMoveAllowed(Position $from, Position $to, Piece $piece): bool
+    private function isPieceMoveAllowed(Board $board, Position $from, Position $to, Color $onTurn): bool
     {
-        return $from->isOnStraight($to) && $this->pathIsFree($from, $to, $piece);
+        $piece = $board->getPiece($from);
+        return match ($piece->type) {
+            PieceType::Rook => $this->isRookMoveAllowed($board, $from, $to),
+            PieceType::Bishop => $this->isBishopMoveAllowed($board, $from, $to),
+            PieceType::Queen => $this->isQueenMoveAllowed($board, $from, $to),
+            PieceType::Knight => $this->isKnightMoveAllowed($board, $from, $to),
+            PieceType::King => $this->isKingMoveAllowed($board, $from, $to),
+            PieceType::Pawn => $this->isPawnMoveAllowed($board, $from, $to, $onTurn),
+            default => false,
+        };
     }
 
-    private function isBishopMoveAllowed(Position $from, Position $to, Piece $piece): bool
+    private function isRookMoveAllowed(Board $board, Position $from, Position $to): bool
     {
-        return $from->isOnDiagonal($to) && $this->pathIsFree($from, $to, $piece);
+        return $from->isOnStraight($to) && $this->pathIsFree($board, $from, $to);
     }
 
-    private function isQueenMoveAllowed(Position $from, Position $to, Piece $piece): bool
+    private function isBishopMoveAllowed(Board $board, Position $from, Position $to): bool
     {
-        return $this->isRookMoveAllowed($from, $to, $piece)
-            || $this->isBishopMoveAllowed($from, $to, $piece);
+        return $from->isOnDiagonal($to) && $this->pathIsFree($board, $from, $to);
     }
 
-    private function pathIsFree(Position $from, Position $to, Piece $piece): bool
+    private function isQueenMoveAllowed(Board $board, Position $from, Position $to): bool
     {
+        return $this->isRookMoveAllowed($board, $from, $to)
+            || $this->isBishopMoveAllowed($board, $from, $to);
+    }
+
+    private function pathIsFree(Board $board, Position $from, Position $to): bool
+    {
+        $piece = $board->getPiece($from);
         $movementVector = [
             $to->file->value <=> $from->file->value,
             $to->rank->value <=> $from->rank->value,
         ];
 
-        $checkPath = function(Position $current) use (&$checkPath, $to, $movementVector, $piece): bool {
+        $checkPath = function(Position $current) use (&$checkPath, $board, $to, $movementVector, $piece): bool {
             $next = new Position(
                 File::from($current->file->value + $movementVector[0]),
                 Rank::from($current->rank->value + $movementVector[1])
             );
-            $blockingPiece = $this->board->getPiece($next);
+            $blockingPiece = $board->getPiece($next);
+            $endReached = $next == $to;
 
             $isNotBlocked = $blockingPiece === null 
-                || ($blockingPiece->color !== $piece->color && $next == $to);
+                || ($blockingPiece->color !== $piece->color && $endReached);
 
-            return $isNotBlocked && ($next == $to || $checkPath($next));
+            return $isNotBlocked && ($endReached || $checkPath($next));
         };
 
         return $checkPath($from);
     }
 
-    private function isKnightMoveAllowed(Position $from, Position $to, Piece $piece): bool
+    private function isKnightMoveAllowed(Board $board, Position $from, Position $to): bool
     {
+        $piece = $board->getPiece($from);
         $fileDiff = abs($to->file->value - $from->file->value);
         $rankDiff = abs($to->rank->value - $from->rank->value);
 
@@ -80,12 +90,13 @@ final class Game
             return false;
         }
 
-        $targetPiece = $this->board->getPiece($to);
+        $targetPiece = $board->getPiece($to);
         return $targetPiece === null || $targetPiece->color !== $piece->color;
     }
 
-    private function isKingMoveAllowed(Position $from, Position $to, Piece $piece): bool
+    private function isKingMoveAllowed(Board $board, Position $from, Position $to): bool
     {
+        $piece = $board->getPiece($from);
         $fileDiff = abs($to->file->value - $from->file->value);
         $rankDiff = abs($to->rank->value - $from->rank->value);
 
@@ -95,13 +106,14 @@ final class Game
             return false;
         }
 
-        $targetPiece = $this->board->getPiece($to);
+        $targetPiece = $board->getPiece($to);
         return $targetPiece === null || $targetPiece->color !== $piece->color;
     }
 
-    private function isPawnMoveAllowed(Position $from, Position $to, Piece $piece): bool
+    private function isPawnMoveAllowed(Board $board, Position $from, Position $to, Color $onTurn): bool
     {
-        $direction = $this->onTurn === Color::White ? 1 : -1;
+        $piece = $board->getPiece($from);
+        $direction = $onTurn === Color::White ? 1 : -1;
         $rankDiff = $to->rank->value - $from->rank->value;
         $fileDiff = abs($to->file->value - $from->file->value);
 
@@ -110,14 +122,36 @@ final class Game
         }
 
         if ($fileDiff === 0) {
-            return $this->board->getPiece($to) === null;
+            return $board->getPiece($to) === null;
         }
 
         if ($fileDiff === 1) {
-            $targetPiece = $this->board->getPiece($to);
+            $targetPiece = $board->getPiece($to);
             return $targetPiece !== null && $targetPiece->color !== $piece->color;
         }
         return false;
+    }
+
+    private function willBeCheckMate(Position $from, Position $to): bool
+    {
+        $testBoard = $this->board->movePiece($from, $to);
+        $kingPosition = $testBoard->findKing($this->onTurn);
+
+        if (!$kingPosition) {
+            return false;
+        }
+
+        $others = $testBoard->getPositionsOfColor($this->onTurn->opposite());
+
+        return array_any(
+            $others,
+            fn (Position $o) => $this->isPieceMoveAllowed(
+                $testBoard,
+                $o,
+                $kingPosition,
+                $this->onTurn->opposite()
+            )
+        );
     }
 
 }

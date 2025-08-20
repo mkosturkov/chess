@@ -40,7 +40,7 @@ class GeneralMovementTest extends TestCase
     }
 
     #[DataProvider('mateMovesProvider')]
-    public function test_can_not_move_if_not_escaping_chess($expected, $from, $to)
+    public function test_can_not_move_if_not_escaping_chess($from, $to)
     {
         $board = new Board()
             ->withPiece(new Position(File::D, Rank::Four), new Piece(Color::White, PieceType::King))
@@ -50,14 +50,14 @@ class GeneralMovementTest extends TestCase
             // the black pawn is next to the black bishop and in front of the white rook, giving chess to the white king
             ->withPiece(new Position(File::C, Rank::Five), new Piece(Color::Black, PieceType::Pawn));
 
-        $this->assertEquals($expected, $this->isMoveAllowed($board, $from, $to));
+        $this->assertFalse($this->isMoveAllowed($board, $from, $to));
     }
 
     public static function mateMovesProvider(): array
     {
         return [
-            'king moves left (mate by bishop)' => [false, new Position(File::D, Rank::Four), new Position(File::C, Rank::Four)],
-            'rook moves right (mate by pawn)' => [false, new Position(File::C, Rank::Six), new Position(File::D, Rank::Six)],
+            'king moves left (mate by bishop)' => [new Position(File::D, Rank::Four), new Position(File::C, Rank::Four)],
+            'rook moves right (mate by pawn)' => [new Position(File::C, Rank::Six), new Position(File::D, Rank::Six)],
         ];
     }
 }
