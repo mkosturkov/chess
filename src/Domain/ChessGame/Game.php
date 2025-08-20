@@ -20,6 +20,7 @@ final class Game
                 PieceType::Bishop => $this->isBishopMoveAllowed($from, $to, $piece),
                 PieceType::Queen => $this->isQueenMoveAllowed($from, $to, $piece),
                 PieceType::Knight => $this->isKnightMoveAllowed($from, $to, $piece),
+                PieceType::King => $this->isKingMoveAllowed($from, $to, $piece),
                 PieceType::Pawn => $this->isPawnMoveAllowed($from, $to, $piece),
                 default => false,
             };
@@ -76,6 +77,21 @@ final class Game
         $isLShaped = ($fileDiff === 2 && $rankDiff === 1) || ($fileDiff === 1 && $rankDiff === 2);
 
         if (!$isLShaped) {
+            return false;
+        }
+
+        $targetPiece = $this->board->getPiece($to);
+        return $targetPiece === null || $targetPiece->color !== $piece->color;
+    }
+
+    private function isKingMoveAllowed(Position $from, Position $to, Piece $piece): bool
+    {
+        $fileDiff = abs($to->file->value - $from->file->value);
+        $rankDiff = abs($to->rank->value - $from->rank->value);
+
+        $isOneSquareMove = $fileDiff <= 1 && $rankDiff <= 1;
+
+        if (!$isOneSquareMove) {
             return false;
         }
 
