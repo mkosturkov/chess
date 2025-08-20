@@ -52,20 +52,20 @@ final class Game
             $to->rank->value <=> $from->rank->value,
         ];
 
-        $next = $from;
-        do {
+        $checkPath = function(Position $current) use (&$checkPath, $to, $movementVector, $piece): bool {
             $next = new Position(
-                File::from($next->file->value + $movementVector[0]),
-                Rank::from($next->rank->value + $movementVector[1])
+                File::from($current->file->value + $movementVector[0]),
+                Rank::from($current->rank->value + $movementVector[1])
             );
             $blockingPiece = $this->board->getPiece($next);
 
-            $isNotBlocked =
-                $blockingPiece === null
+            $isNotBlocked = $blockingPiece === null 
                 || ($blockingPiece->color !== $piece->color && $next == $to);
-        } while ($isNotBlocked && $next != $to);
 
-        return $isNotBlocked;
+            return $isNotBlocked && ($next == $to || $checkPath($next));
+        };
+
+        return $checkPath($from);
     }
 
     private function isKnightMoveAllowed(Position $from, Position $to, Piece $piece): bool
